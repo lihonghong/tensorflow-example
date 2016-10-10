@@ -10,6 +10,7 @@ import tensorflow as tf
 # from sklearn import metrics
 import melt
 import model
+import numpy as np
 
 flags = tf.app.flags
 FLAGS = flags.FLAGS
@@ -25,6 +26,7 @@ flags.DEFINE_integer('num_class', 1, 'output unit size')
 flags.DEFINE_integer('gpu', 0, 'use which gpu')
 flags.DEFINE_string('modelPath', '', 'path of saving train model')
 flags.DEFINE_string("optimizer", "sgd", "optimizer to train: sgd,momentum,adadelta,adagrad,adam,ftrl,rmsprop")
+flags.DEFINE_string("predictPath", '', "path of saving predict data")
 
 trainset_file = FLAGS.train
 testset_file = FLAGS.test
@@ -35,7 +37,9 @@ batch_size = FLAGS.batch_size
 numClass = FLAGS.num_class
 method = FLAGS.method
 gpu = FLAGS.gpu
+
 modelPath = FLAGS.modelPath
+predictPath = FLAGS.predictPath
 
 print 'gpu: ', gpu
 print 'model path: ', modelPath
@@ -92,3 +96,8 @@ if modelPath != '':
     saver = tf.train.Saver()
     save_path = saver.save(sess, modelPath)
     print("Model saved in file: %s" % save_path)
+
+if predictPath != '':
+    np.savetxt(predictPath, np.c_[teY, predicts], delimiter=',', comments='',
+               fmt='%d,%f')
+    print("Predict result saved in :%s", predictPath)
