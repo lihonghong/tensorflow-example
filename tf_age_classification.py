@@ -57,7 +57,7 @@ print 'batch_size:', batch_size, ' learning_rate:', learning_rate, ' num_epochs:
 
 trainer = melt.gen_multi_classification_trainer(trainset, numClass)
 
-py_x = model.Mlp().forward(trainer, FLAGS, numClass, gpu)
+py_x = model.MlpBias().forward(trainer, FLAGS, numClass, gpu)
 Y = trainer.Y
 
 cost = tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(py_x, Y))
@@ -68,13 +68,15 @@ sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_pl
 init = tf.initialize_all_variables()
 sess.run(init)
 
-teX, teY = testset.full_batch()
-teEncodeY = melt.oneHotLabel(teY, numClass)
-
+test_batch_size = 1000
 num_train_instances = trainset.num_instances()
 for i in range(num_epochs):
-    predicts, cost_ = sess.run([predict_op, cost], feed_dict=trainer.gen_feed_dict(teX, teEncodeY))
-    print i, 'cost:', cost_ / len(teY)
+    for start, end in zip(range(0, testset.num_instances(), test_batch_size),
+                          range(batch_size, testset.num_instances(), test_batch_size)):
+        teX, teY = testset.mini_batch(start, end)
+        teEncodeY = melt.oneHotLabel(teY, numClass)
+        predicts, cost_ = sess.run([predict_op, cost], feed_dict=trainer.gen_feed_dict(teX, teEncodeY))
+        print 'epoch:', i, 'start:', start, 'end:', end, 'cost:', cost_ / len(teY)
     # print "Classification report for classifier %s\n" % (metrics.classification_report(teY, melt.prob2Class(predicts)))
 
     for start, end in zip(range(0, num_train_instances, batch_size),

@@ -27,6 +27,23 @@ class Mlp:
         return py_x
 
 
+class MlpBias:
+    def model(self, X, w_h, b_h, w_o, b_o, gpu):
+        with tf.device('/gpu:%d' % gpu):
+            h = tf.nn.sigmoid(melt.matmul(X, w_h) + b_h)  # this is a basic mlp, think 2 stacked logistic regressions
+            return tf.matmul(h,
+                             w_o) + b_o  # note that we dont take the softmax at the end because our cost fn does that for us
+
+    def forward(self, trainer, FLAGS, numClass, gpu):
+        w_h = melt.init_weights([trainer.num_features, FLAGS.hidden_size])  # create symbolic variables
+        b_h = melt.init_weights([FLAGS.hidden_size])  # create symbolic variables
+        w_o = melt.init_weights([FLAGS.hidden_size, numClass])
+        b_o = melt.init_weights([numClass])
+
+        py_x = self.model(trainer.X, w_h, b_h, w_o, b_o, gpu)
+        return py_x
+
+
 class Mlp2Layer:
     def model(self, X, w_h1, w_h2, w_o):
         h1 = tf.nn.sigmoid(melt.matmul(X, w_h1))  # this is a basic mlp, think 2 stacked logistic regressions
