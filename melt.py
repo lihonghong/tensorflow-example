@@ -9,8 +9,7 @@
 
 import numpy as np
 import os
-import scipy as sp
-import pandas as pd
+# import scipy as sp
 import tensorflow as tf
 
 # ---------------------------melt load data
@@ -241,13 +240,13 @@ def gen_multi_classification_trainer(dataset, numClass):
     return SparseBinaryClassificationTrainer(dataset, numClass)
 
 
-def logloss(act, pred):
-    epsilon = 1e-15
-    pred = sp.maximum(epsilon, pred)
-    pred = sp.minimum(1 - epsilon, pred)
-    ll = sum(act * sp.log(pred) + sp.subtract(1, act) * sp.log(sp.subtract(1, pred)))
-    ll = ll * -1.0 / len(act)
-    return ll
+# def logloss(act, pred):
+#     epsilon = 1e-15
+#     pred = sp.maximum(epsilon, pred)
+#     pred = sp.minimum(1 - epsilon, pred)
+#     ll = sum(act * sp.log(pred) + sp.subtract(1, act) * sp.log(sp.subtract(1, pred)))
+#     ll = ll * -1.0 / len(act)
+#     return ll
 
 
 def classifyByThread(prob, thread):

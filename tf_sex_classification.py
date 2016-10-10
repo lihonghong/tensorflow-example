@@ -4,12 +4,10 @@
 # run :
 # python ./tf_sex_classification.py --train sex.train --test sex.validation
 # ==============================================================================
-import sys
 
 import tensorflow as tf
-import numpy as np
-from sklearn.metrics import roc_auc_score
-from sklearn import metrics
+# from sklearn.metrics import roc_auc_score
+# from sklearn import metrics
 import melt
 import model
 
@@ -73,10 +71,10 @@ num_train_instances = trainset.num_instances()
 thread = 0.5
 for i in range(num_epochs):
     predicts, cost_ = sess.run([predict_op, cost], feed_dict=trainer.gen_feed_dict(teX, teY))
-    print i, 'auc:', roc_auc_score(teY, predicts), 'cost:', cost_ / len(teY)
-    print 'logloss:', melt.logloss(teY, predicts)
-    print "Classification report for classifier %s\n" % (
-        metrics.classification_report(teY, melt.classifyByThread(predicts, thread)))
+    print i, 'cost:', cost_ / len(teY)
+    # print i, 'auc:', roc_auc_score(teY, predicts)
+    # print "Classification report for classifier %s\n" % (
+    #     metrics.classification_report(teY, melt.classifyByThread(predicts, thread)))
 
     for start, end in zip(range(0, num_train_instances, batch_size),
                           range(batch_size, num_train_instances, batch_size)):
@@ -84,10 +82,11 @@ for i in range(num_epochs):
         sess.run(train_op, feed_dict=trainer.gen_feed_dict(trX, trY))
 
 predicts, cost_ = sess.run([predict_op, cost], feed_dict=trainer.gen_feed_dict(teX, teY))
-print 'final ', 'auc:', roc_auc_score(teY, predicts), 'cost:', cost_ / len(teY)
-print "Classification report for classifier %s\n" % (
-    metrics.classification_report(teY, melt.classifyByThread(predicts, thread)))
-print "Confusion matrix:\n%s" % metrics.confusion_matrix(teY, melt.classifyByThread(predicts, thread))
+print 'final ', 'cost:', cost_ / len(teY)
+# print 'final ', 'auc:', roc_auc_score(teY, predicts)
+# print "Classification report for classifier %s\n" % (
+#     metrics.classification_report(teY, melt.classifyByThread(predicts, thread)))
+# print "Confusion matrix:\n%s" % metrics.confusion_matrix(teY, melt.classifyByThread(predicts, thread))
 
 if modelPath != '':
     saver = tf.train.Saver()

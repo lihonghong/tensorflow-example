@@ -5,15 +5,10 @@
 # python ./tf_age_classification.py --train sex.train --test sex.validation
 # ==============================================================================
 
-import sys
-
 import tensorflow as tf
-import numpy as np
-from sklearn.metrics import roc_auc_score
-from sklearn import metrics
+# from sklearn import metrics
 import melt
 import model
-import pandas as pd
 
 flags = tf.app.flags
 FLAGS = flags.FLAGS
@@ -29,6 +24,7 @@ flags.DEFINE_integer('num_class', 7, 'output unit size')
 flags.DEFINE_integer('gpu', 0, 'use which gpu')
 flags.DEFINE_string('modelPath', '', 'path of saving train model')
 flags.DEFINE_string("optimizer", "sgd", "optimizer to train: sgd,momentum,adadelta,adagrad,adam,ftrl,rmsprop")
+flags.DEFINE_string("predictPath", "", "path of saving predict data")
 
 trainset_file = FLAGS.train
 testset_file = FLAGS.test
@@ -76,7 +72,7 @@ num_train_instances = trainset.num_instances()
 for i in range(num_epochs):
     predicts, cost_ = sess.run([predict_op, cost], feed_dict=trainer.gen_feed_dict(teX, teEncodeY))
     print i, 'cost:', cost_ / len(teY)
-    print "Classification report for classifier %s\n" % (metrics.classification_report(teY, melt.prob2Class(predicts)))
+    # print "Classification report for classifier %s\n" % (metrics.classification_report(teY, melt.prob2Class(predicts)))
 
     for start, end in zip(range(0, num_train_instances, batch_size),
                           range(batch_size, num_train_instances, batch_size)):
@@ -86,8 +82,8 @@ for i in range(num_epochs):
 
 predicts, cost_ = sess.run([predict_op, cost], feed_dict=trainer.gen_feed_dict(teX, teEncodeY))
 print 'final cost:', cost_ / len(teY)
-print "Classification report for classifier %s\n" % (metrics.classification_report(teY, melt.prob2Class(predicts)))
-print "Confusion matrix:\n%s" % metrics.confusion_matrix(teY, melt.prob2Class(predicts))
+# print "Classification report for classifier %s\n" % (metrics.classification_report(teY, melt.prob2Class(predicts)))
+# print "Confusion matrix:\n%s" % metrics.confusion_matrix(teY, melt.prob2Class(predicts))
 
 if modelPath != '':
     saver = tf.train.Saver()
