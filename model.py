@@ -40,3 +40,24 @@ class Mlp2Layer:
 
         py_x = self.model(trainer.X, w_h1, w_h2, w_o)
         return py_x
+
+
+def getOptimizer(FLAGS, learning_rate):
+    if FLAGS.optimizer == "sgd":
+        optimizer = tf.train.GradientDescentOptimizer(learning_rate)
+    elif FLAGS.optimizer == "momentum":
+        optimizer = tf.train.MomentumOptimizer(learning_rate)
+    elif FLAGS.optimizer == "adadelta":
+        optimizer = tf.train.AdadeltaOptimizer(learning_rate)
+    elif FLAGS.optimizer == "adagrad":
+        optimizer = tf.train.AdagradOptimizer(learning_rate)
+    elif FLAGS.optimizer == "adam":
+        optimizer = tf.train.AdamOptimizer(learning_rate)
+    elif FLAGS.optimizer == "ftrl":
+        optimizer = tf.train.FtrlOptimizer(learning_rate)
+    elif FLAGS.optimizer == "rmsprop":
+        optimizer = tf.train.RMSPropOptimizer(learning_rate)
+    else:
+        print("Unknow optimizer: {}, exit now".format(FLAGS.optimizer))
+        exit(1)
+    return optimizer
