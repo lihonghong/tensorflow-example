@@ -69,14 +69,16 @@ sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_pl
 init = tf.initialize_all_variables()
 sess.run(init)
 
+teX, teY = testset.full_batch()
+
 test_batch_size = 1000
 num_train_instances = trainset.num_instances()
 for i in range(num_epochs):
     for start, end in zip(range(0, testset.num_instances(), test_batch_size),
-                          range(batch_size, testset.num_instances(), test_batch_size)):
-        teX, teY = testset.mini_batch(start, end)
-        predicts, cost_ = sess.run([predict_op, cost], feed_dict=trainer.gen_feed_dict(teX, teY))
-        print 'epoch:', i, 'start:', start, 'end:', end, 'cost:', cost_ / len(teY)
+                          range(test_batch_size, testset.num_instances(), test_batch_size)):
+        teX_test, teY_test = testset.mini_batch(start, end)
+        predicts, cost_ = sess.run([predict_op, cost], feed_dict=trainer.gen_feed_dict(teX_test, teY_test))
+        print 'epoch:', i, 'start:', start, 'end:', end, 'cost:', cost_ / len(teY_test)
     # print i, 'auc:', roc_auc_score(teY, predicts)
     # print "Classification report for classifier %s\n" % (
     #     metrics.classification_report(teY, melt.classifyByThread(predicts, thread)))
