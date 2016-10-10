@@ -11,7 +11,7 @@ import numpy as np
 import os
 import scipy as sp
 import pandas as pd
-
+import tensorflow as tf
 
 # ---------------------------melt load data
 # Now support melt dense and sparse input file format, for sparse input no
@@ -215,15 +215,15 @@ class SparseBinaryClassificationTrainer(object):
         self.features = dataset.features
         self.num_features = dataset.num_features
 
-        self.sp_indices = tf.placeholder(tf.int64)
-        self.sp_shape = tf.placeholder(tf.int64)
-        self.sp_ids_val = tf.placeholder(tf.int64)
-        self.sp_weights_val = tf.placeholder(tf.float32)
-        self.sp_ids = tf.SparseTensor(self.sp_indices, self.sp_ids_val, self.sp_shape)
-        self.sp_weights = tf.SparseTensor(self.sp_indices, self.sp_weights_val, self.sp_shape)
-
-        self.X = (self.sp_ids, self.sp_weights)
-        self.Y = tf.placeholder("float", [None, numClass])
+        with tf.device('/cpu:0'):
+            self.sp_indices = tf.placeholder(tf.int64)
+            self.sp_shape = tf.placeholder(tf.int64)
+            self.sp_ids_val = tf.placeholder(tf.int64)
+            self.sp_weights_val = tf.placeholder(tf.float32)
+            self.sp_ids = tf.SparseTensor(self.sp_indices, self.sp_ids_val, self.sp_shape)
+            self.sp_weights = tf.SparseTensor(self.sp_indices, self.sp_weights_val, self.sp_shape)
+            self.X = (self.sp_ids, self.sp_weights)
+            self.Y = tf.placeholder("float", [None, numClass])
 
     def gen_feed_dict(self, trX, trY):
         return {self.Y: trY, self.sp_indices: trX.sp_indices, self.sp_shape: trX.sp_shape,

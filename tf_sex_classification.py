@@ -24,6 +24,7 @@ flags.DEFINE_string('test', '', 'test file')
 flags.DEFINE_string('method', 'mlp', 'currently support mlp')
 flags.DEFINE_integer('hidden_size', 50, 'Hidden unit size')
 flags.DEFINE_integer('num_class', 1, 'output unit size')
+flags.DEFINE_integer('gpu', 0, 'use which gpu')
 
 trainset_file = FLAGS.train
 testset_file = FLAGS.test
@@ -32,6 +33,7 @@ learning_rate = FLAGS.learning_rate
 num_epochs = FLAGS.num_epochs
 batch_size = FLAGS.batch_size
 numClass = FLAGS.num_class
+gpu = FLAGS.gpu
 
 method = FLAGS.method
 
@@ -49,14 +51,14 @@ print 'batch_size:', batch_size, ' learning_rate:', learning_rate, ' num_epochs:
 
 trainer = melt.gen_binary_classification_trainer(trainset)
 
-py_x = model.Mlp().forward(trainer, FLAGS, numClass)
+py_x = model.Mlp().forward(trainer, FLAGS, numClass, gpu)
 Y = trainer.Y
 
 cost = tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(py_x, Y))
 train_op = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)  # construct optimizer
 predict_op = tf.nn.sigmoid(py_x)
 
-sess = tf.Session()
+sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=True))
 init = tf.initialize_all_variables()
 sess.run(init)
 

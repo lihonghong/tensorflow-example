@@ -26,6 +26,7 @@ flags.DEFINE_string('test', './corpus/feature.normed.rand.12000.1_2.txt', 'test 
 flags.DEFINE_string('method', 'logistic', 'currently support logistic/mlp')
 flags.DEFINE_integer('hidden_size', 50, 'Hidden unit size')
 flags.DEFINE_integer('num_class', 7, 'output unit size')
+flags.DEFINE_integer('gpu', 0, 'use which gpu')
 
 trainset_file = FLAGS.train
 testset_file = FLAGS.test
@@ -35,6 +36,7 @@ num_epochs = FLAGS.num_epochs
 batch_size = FLAGS.batch_size
 method = FLAGS.method
 numClass = FLAGS.num_class
+gpu = FLAGS.gpu
 
 trainset = melt.load_dataset(trainset_file)
 print "finish loading train set ", trainset_file
@@ -50,14 +52,14 @@ print 'batch_size:', batch_size, ' learning_rate:', learning_rate, ' num_epochs:
 
 trainer = melt.gen_multi_classification_trainer(trainset, numClass)
 
-py_x = model.Mlp().forward(trainer, FLAGS, numClass)
+py_x = model.Mlp().forward(trainer, FLAGS, numClass, gpu)
 Y = trainer.Y
 
 cost = tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(py_x, Y))
 train_op = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)  # construct optimizer
 predict_op = tf.nn.sigmoid(py_x)
 
-sess = tf.Session()
+sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=True))
 init = tf.initialize_all_variables()
 sess.run(init)
 
