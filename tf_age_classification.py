@@ -69,7 +69,7 @@ init = tf.initialize_all_variables()
 sess.run(init)
 
 teX, teY = testset.full_batch()
-teEncodeY = melt.oneHotLabel(teY)
+teEncodeY = melt.oneHotLabel(teY, numClass)
 
 num_train_instances = trainset.num_instances()
 for i in range(num_epochs):
@@ -80,7 +80,7 @@ for i in range(num_epochs):
     for start, end in zip(range(0, num_train_instances, batch_size),
                           range(batch_size, num_train_instances, batch_size)):
         trX, trY = trainset.mini_batch(start, end)
-        trY = melt.oneHotLabel(trY)
+        trY = melt.oneHotLabel(trY, numClass)
         sess.run(train_op, feed_dict=trainer.gen_feed_dict(trX, trY))
 
 predicts, cost_ = sess.run([predict_op, cost], feed_dict=trainer.gen_feed_dict(teX, teEncodeY))

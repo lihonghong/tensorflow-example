@@ -259,10 +259,10 @@ def classifyByThread(prob, thread):
     return r
 
 
-def oneHotLabel(Y):
+def oneHotLabel(Y, numClass):
     labelMatrix = []
     for i in range(len(Y)):
-        label = np.zeros(7)
+        label = np.zeros(numClass)
         label[Y[i][0]] = 1
         labelMatrix.append(label)
     return labelMatrix
