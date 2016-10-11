@@ -11,6 +11,8 @@ import numpy as np
 import os
 # import scipy as sp
 import tensorflow as tf
+import math
+
 
 # ---------------------------melt load data
 # Now support melt dense and sparse input file format, for sparse input no
@@ -240,13 +242,17 @@ def gen_multi_classification_trainer(dataset, numClass):
     return SparseBinaryClassificationTrainer(dataset, numClass)
 
 
-# def logloss(act, pred):
-#     epsilon = 1e-15
-#     pred = sp.maximum(epsilon, pred)
-#     pred = sp.minimum(1 - epsilon, pred)
-#     ll = sum(act * sp.log(pred) + sp.subtract(1, act) * sp.log(sp.subtract(1, pred)))
-#     ll = ll * -1.0 / len(act)
-#     return ll
+def logloss(act, pred):
+    epsilon = 1e-15
+    ll = 0
+    for i in range(len(act)):
+        label = act[i][0]
+        p = pred[i][0]
+        p = max(epsilon, p)
+        p = min(1 - epsilon, p)
+        ll = ll + label * math.log(p) + (1 - label) * math.log((1 - p))
+    ll = (ll * -1.0) / len(act)
+    return ll
 
 
 def classifyByThread(prob, thread):

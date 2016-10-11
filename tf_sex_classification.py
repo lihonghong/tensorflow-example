@@ -78,7 +78,8 @@ for i in range(num_epochs):
                           range(test_batch_size, testset.num_instances(), test_batch_size)):
         teX_test, teY_test = testset.mini_batch(start, end)
         predicts, cost_ = sess.run([predict_op, cost], feed_dict=trainer.gen_feed_dict(teX_test, teY_test))
-        print 'epoch:', i, 'start:', start, 'end:', end, 'cost:', cost_ / len(teY_test)
+        print 'epoch:', i, 'start:', start, 'end:', end, \
+            'tf cost:', cost_ / len(teY_test), 'custom cost:', melt.logloss(teY_test, predicts)
     # print i, 'auc:', roc_auc_score(teY, predicts)
     # print "Classification report for classifier %s\n" % (
     #     metrics.classification_report(teY, melt.classifyByThread(predicts, thread)))
